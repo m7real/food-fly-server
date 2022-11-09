@@ -39,7 +39,7 @@ async function run() {
     // post new service
     app.post("/services", async (req, res) => {
       const service = req.body;
-      // service.lastModified = new Date().getTime();
+      // service.last_modified = new Date().getTime();
       const result = await serviceCollection.insertOne(service);
       res.send(result);
     });
@@ -54,11 +54,19 @@ async function run() {
     });
 
     // review APIs
+    // post new review
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      review.last_modified = new Date().getTime();
+      const result = await reviewCollection.insertOne(review);
+      res.send({ result, review });
+    });
+
     // get reviews of a specific service
     app.get("/reviews/:serviceId", async (req, res) => {
       const serviceId = req.params.serviceId;
       const query = { service_id: serviceId };
-      const cursor = reviewCollection.find(query);
+      const cursor = reviewCollection.find(query).sort({ last_modified: -1 });
       const reviews = await cursor.toArray();
       res.send(reviews);
     });
