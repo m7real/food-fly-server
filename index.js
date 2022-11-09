@@ -79,12 +79,33 @@ async function run() {
     });
 
     // review APIs
+    // get reviews
+    app.get("/reviews", async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const cursor = reviewCollection.find(query).sort({ last_modified: -1 });
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
+
     // post new review
     app.post("/reviews", async (req, res) => {
       const review = req.body;
       review.last_modified = new Date().getTime();
       const result = await reviewCollection.insertOne(review);
       res.send({ result, review });
+    });
+
+    // delete review
+    app.delete("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(query);
+      res.send(result);
     });
 
     // get reviews of a specific service
