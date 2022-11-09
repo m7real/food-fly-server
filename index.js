@@ -19,6 +19,14 @@ async function run() {
   try {
     const serviceCollection = client.db("foodFly").collection("services");
     const reviewCollection = client.db("foodFly").collection("reviews");
+
+    // get the services
+    app.get("/services", async (req, res) => {
+      const query = {};
+      const cursor = serviceCollection.find(query);
+      const services = await cursor.toArray();
+      res.send(services);
+    });
   } finally {
     // prettier-ignore
 }
