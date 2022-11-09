@@ -22,10 +22,23 @@ async function run() {
 
     // get the services
     app.get("/services", async (req, res) => {
+      const count = parseInt(req.query.count);
       const query = {};
-      const cursor = serviceCollection.find(query);
-      const services = await cursor.toArray();
-      res.send(services);
+      const cursor = serviceCollection.find(query).sort({ _id: -1 });
+      if (count) {
+        const services = await cursor.limit(count).toArray();
+        res.send(services);
+      } else {
+        const services = await cursor.toArray();
+        res.send(services);
+      }
+    });
+
+    // post new service
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
     });
   } finally {
     // prettier-ignore
