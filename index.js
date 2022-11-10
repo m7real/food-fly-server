@@ -37,6 +37,7 @@ async function run() {
   try {
     const serviceCollection = client.db("foodFly").collection("services");
     const reviewCollection = client.db("foodFly").collection("reviews");
+    const blogCollection = client.db("foodFly").collection("blogs");
 
     // provides JWT Token
     app.post("/jwt", (req, res) => {
@@ -145,6 +146,14 @@ async function run() {
       const cursor = reviewCollection.find(query).sort({ last_modified: -1 });
       const reviews = await cursor.toArray();
       res.send(reviews);
+    });
+
+    // get blog
+    app.get("/blog", async (req, res) => {
+      const query = {};
+      const cursor = blogCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
     });
   } finally {
     // prettier-ignore
