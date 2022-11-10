@@ -43,7 +43,6 @@ async function run() {
     // provides JWT Token
     app.post("/jwt", (req, res) => {
       const user = req.body;
-      console.log(user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
       res.send({ token });
     });
@@ -53,8 +52,8 @@ async function run() {
       const count = parseInt(req.query.count);
       const query = {};
       if (count) {
-        // latest added service will show on homepage
-        const cursor = serviceCollection.find(query).sort({ _id: -1 });
+        // sorting services in a descending order based on inserting time
+        const cursor = serviceCollection.find(query).sort({ last_modified: -1 });
         const services = await cursor.limit(count).toArray();
         res.send(services);
       } else {
@@ -67,6 +66,7 @@ async function run() {
     // post new service
     app.post("/services", verifyJWT, async (req, res) => {
       const service = req.body;
+      service.last_modified = new Date().getTime();
       const result = await serviceCollection.insertOne(service);
       res.send(result);
     });
@@ -94,6 +94,7 @@ async function run() {
           email: req.query.email,
         };
       }
+      // sorting reviews in a descending order based on inserting time
       const cursor = reviewCollection.find(query).sort({ last_modified: -1 });
       const reviews = await cursor.toArray();
       res.send(reviews);
