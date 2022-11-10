@@ -100,6 +100,14 @@ async function run() {
       res.send({ result, review });
     });
 
+    // get single review
+    app.get("/reviewById/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const review = await reviewCollection.findOne(query);
+      res.send(review);
+    });
+
     // delete review
     app.delete("/reviews/:id", async (req, res) => {
       const id = req.params.id;
