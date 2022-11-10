@@ -38,6 +38,7 @@ async function run() {
     const serviceCollection = client.db("foodFly").collection("services");
     const reviewCollection = client.db("foodFly").collection("reviews");
     const blogCollection = client.db("foodFly").collection("blogs");
+    const faqCollection = client.db("foodFly").collection("faqs");
 
     // provides JWT Token
     app.post("/jwt", (req, res) => {
@@ -152,6 +153,13 @@ async function run() {
     app.get("/blog", async (req, res) => {
       const query = {};
       const cursor = blogCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    // get faq
+    app.get("/faq", async (req, res) => {
+      const query = {};
+      const cursor = faqCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
