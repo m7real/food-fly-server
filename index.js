@@ -63,7 +63,7 @@ async function run() {
     });
 
     // post new service
-    app.post("/services", async (req, res) => {
+    app.post("/services", verifyJWT, async (req, res) => {
       const service = req.body;
       const result = await serviceCollection.insertOne(service);
       res.send(result);
@@ -80,7 +80,12 @@ async function run() {
 
     // review APIs
     // get reviews
-    app.get("/reviews", async (req, res) => {
+    app.get("/reviews", verifyJWT, async (req, res) => {
+      const decoded = req.decoded;
+      if (decoded.email !== req.query.email) {
+        res.status(403).send({ message: "Forbidden access" });
+      }
+
       let query = {};
       if (req.query.email) {
         query = {
@@ -93,7 +98,7 @@ async function run() {
     });
 
     // post new review
-    app.post("/reviews", async (req, res) => {
+    app.post("/reviews", verifyJWT, async (req, res) => {
       const review = req.body;
       review.last_modified = new Date().getTime();
       const result = await reviewCollection.insertOne(review);
@@ -101,7 +106,7 @@ async function run() {
     });
 
     // update review
-    app.patch("/reviews/:id", async (req, res) => {
+    app.patch("/reviews/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const reviewText = req.body.reviewText;
       const query = { _id: ObjectId(id) };
@@ -124,7 +129,7 @@ async function run() {
     });
 
     // delete review
-    app.delete("/reviews/:id", async (req, res) => {
+    app.delete("/reviews/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewCollection.deleteOne(query);
